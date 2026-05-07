@@ -198,7 +198,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[a-fA-F0-9]{16}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$"
             }
           }
         ],
@@ -213,8 +214,21 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "429": {
             "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "description": "Pending registration dependency temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetryableErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -4152,6 +4166,22 @@
         "additionalProperties": true
       },
       "RateLimitErrorResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "retry_after": {
+                "type": "integer"
+              }
+            },
+            "required": ["retry_after"]
+          }
+        ]
+      },
+      "RetryableErrorResponse": {
         "allOf": [
           {
             "$ref": "#/components/schemas/ErrorResponse"
