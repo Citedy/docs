@@ -5819,7 +5819,13 @@
           "scout.dispatched",
           "session.articles_generated",
           "billing.credits_low",
-          "billing.credits_empty"
+          "billing.credits_empty",
+          "agent_worker.published",
+          "agent_worker.competitor_diff_detected",
+          "agent_worker.budget_exhausted",
+          "agent_worker.paused",
+          "agent_worker.run_failed",
+          "agent_worker.approval_requested"
         ]
       },
       "WebhookDeliveryStatus": {
