@@ -243,6 +243,7 @@
               "api-reference/seo-tools/extract-open-graphtwitter-preview-metadata",
               "api-reference/seo-tools/generate-branded-open-graph-image",
               "api-reference/seo-tools/get-async-brand-scan-statusresult",
+              "api-reference/seo-tools/list-available-agent-tools",
               "api-reference/seo-tools/plan-internal-links-from-page-+-targets",
               "api-reference/seo-tools/start-async-ai-brand-visibility-scan",
               "api-reference/seo-tools/validate-page-json-ld-schema-markup"

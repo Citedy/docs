@@ -2728,6 +2728,84 @@
         }
       }
     },
+    "/api/agent/tools": {
+      "get": {
+        "tags": ["SEO Tools"],
+        "summary": "List available agent tools",
+        "operationId": "agentToolsManifest",
+        "security": [
+          {
+            "AgentApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available tool manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["count", "tools"],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "tools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "method",
+                          "path",
+                          "required_fields",
+                          "sample_payload"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "method": {
+                            "type": "string",
+                            "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "required_fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "sample_payload": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
     "/api/agent/tools/meta-tags": {
       "post": {
         "tags": ["SEO Tools"],
