@@ -7626,7 +7626,7 @@
           "privacy_status": {
             "type": "string",
             "enum": ["public", "unlisted", "private"],
-            "description": "Publish privacy. YouTube supports public/unlisted/private. TikTok should use tiktok_privacy_level selected from creator_info; legacy privacy_status=private maps to SELF_ONLY. Instagram Reels ignores this field."
+            "description": "Publish privacy. YouTube supports public/unlisted/private. TikTok Beta currently supports private publishing only; privacy_status=private maps to SELF_ONLY. Instagram Reels ignores this field."
           },
           "tiktok_privacy_level": {
             "type": "string",
@@ -7636,7 +7636,7 @@
               "MUTUAL_FOLLOW_FRIENDS",
               "SELF_ONLY"
             ],
-            "description": "TikTok-only visibility level selected by the creator from the latest creator_info privacy_level_options."
+            "description": "TikTok-only visibility level. During TikTok Beta, use SELF_ONLY."
           }
         },
         "allOf": [
