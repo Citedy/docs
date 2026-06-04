@@ -7626,7 +7626,7 @@
           "privacy_status": {
             "type": "string",
             "enum": ["public", "unlisted", "private"],
-            "description": "Publish privacy. YouTube supports public/unlisted/private. TikTok Beta currently supports private publishing only; privacy_status=private maps to SELF_ONLY. Instagram Reels ignores this field."
+            "description": "Publish privacy. YouTube supports public/unlisted/private. TikTok uses tiktok_privacy_level from the account's current creator_info options; privacy_status=private remains a compatibility fallback for SELF_ONLY. Instagram Reels ignores this field."
           },
           "tiktok_privacy_level": {
             "type": "string",
@@ -7636,7 +7636,37 @@
               "MUTUAL_FOLLOW_FRIENDS",
               "SELF_ONLY"
             ],
-            "description": "TikTok-only visibility level. During TikTok Beta, use SELF_ONLY."
+            "description": "TikTok-only visibility level selected from the account's current TikTok creator_info options."
+          },
+          "tiktok_title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2200,
+            "description": "TikTok-only reviewed post title/caption."
+          },
+          "tiktok_disable_comment": {
+            "type": "boolean",
+            "description": "TikTok-only flag to disable comments for the post."
+          },
+          "tiktok_disable_duet": {
+            "type": "boolean",
+            "description": "TikTok-only flag to disable duets for the post."
+          },
+          "tiktok_disable_stitch": {
+            "type": "boolean",
+            "description": "TikTok-only flag to disable stitches for the post."
+          },
+          "tiktok_brand_content_toggle": {
+            "type": "boolean",
+            "description": "TikTok-only commercial disclosure flag for third-party branded content. Branded content cannot use SELF_ONLY visibility."
+          },
+          "tiktok_brand_organic_toggle": {
+            "type": "boolean",
+            "description": "TikTok-only commercial disclosure flag for content promoting the creator's own brand."
+          },
+          "tiktok_is_aigc": {
+            "type": "boolean",
+            "description": "TikTok-only flag indicating AI-generated content."
           }
         },
         "allOf": [
@@ -7657,12 +7687,12 @@
             },
             "then": {
               "anyOf": [
-                { "required": ["tiktok_privacy_level"] },
+                { "required": ["tiktok_title", "tiktok_privacy_level"] },
                 {
                   "properties": {
                     "privacy_status": { "const": "private" }
                   },
-                  "required": ["privacy_status"]
+                  "required": ["tiktok_title", "privacy_status"]
                 }
               ]
             }
