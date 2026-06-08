@@ -263,6 +263,14 @@
             "pages": [
               "api-reference/gsc/get-gsc-performance-report"
             ]
+          },
+          {
+            "group": "Warm Leads",
+            "pages": [
+              "api-reference/warm-leads/export-a-citedy-warm-lead-report",
+              "api-reference/warm-leads/get-a-citedy-warm-lead-run",
+              "api-reference/warm-leads/start-a-citedy-warm-lead-report"
+            ]
           }
         ]
       }

@@ -60,6 +60,10 @@
       "description": "Lead magnet generation and state"
     },
     {
+      "name": "Warm Leads",
+      "description": "Warm-lead report generation and export"
+    },
+    {
       "name": "Ingest",
       "description": "Content ingestion jobs"
     },
@@ -1148,6 +1152,198 @@
           },
           "429": {
             "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/agent/citedy-warm-lead": {
+      "post": {
+        "tags": ["Warm Leads"],
+        "operationId": "createCitedyWarmLeadRun",
+        "summary": "Start a Citedy warm-lead report",
+        "description": "Creates one tenant-scoped warm-lead run for one company domain. Accepted new runs charge exactly 40 Citedy credits. Poll GET /api/agent/citedy-warm-lead/{runId} for status and result.",
+        "security": [
+          {
+            "AgentApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWarmLeadRunRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing idempotent warm-lead run returned without a new credit charge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateWarmLeadRunResponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Warm-lead run accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateWarmLeadRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/PaymentRequired"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/agent/citedy-warm-lead/{runId}": {
+      "get": {
+        "tags": ["Warm Leads"],
+        "operationId": "getCitedyWarmLeadRun",
+        "summary": "Get a Citedy warm-lead run",
+        "security": [
+          {
+            "AgentApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Warm-lead run state and canonical JSON result when available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarmLeadRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/agent/citedy-warm-lead/{runId}/export": {
+      "get": {
+        "tags": ["Warm Leads"],
+        "operationId": "exportCitedyWarmLeadRun",
+        "summary": "Export a Citedy warm-lead report",
+        "description": "Downloads an export projection of the canonical JSON result. Supported formats: JSON, CSV, and Excel .xlsx.",
+        "security": [
+          {
+            "AgentApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "csv", "xlsx"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Warm-lead export file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "Canonical warm-lead JSON result object."
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "description": "CSV export text."
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Excel .xlsx binary export."
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -5391,6 +5587,234 @@
         },
         "required": ["id", "status", "title", "type", "topic", "created_at"],
         "additionalProperties": false
+      },
+      "CreateWarmLeadRunRequest": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "description": "One company domain. Bare domains and http(s) URLs are accepted, but paths/social profile URLs are rejected."
+          },
+          "icp": {
+            "type": "string",
+            "enum": ["seo-geo-agency", "content-led-saas", "vertical-saas"],
+            "description": "Ideal customer profile. Defaults to content-led-saas when omitted."
+          },
+          "buyerRoles": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          },
+          "maxContacts": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3,
+            "description": "Maximum buyer candidates. Defaults to 3 when omitted."
+          },
+          "drafts": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3,
+            "description": "Maximum outreach drafts. Defaults to 3 when omitted."
+          },
+          "freshnessDays": {
+            "type": "integer",
+            "minimum": 7,
+            "maximum": 365,
+            "description": "Evidence lookback window in days. Defaults to 90 when omitted."
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": ["domain"],
+        "additionalProperties": false
+      },
+      "CreateWarmLeadRunResponse": {
+        "type": "object",
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/WarmLeadRun"
+          },
+          "credits_charged": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotent": {
+            "type": "boolean"
+          }
+        },
+        "required": ["run", "credits_charged"],
+        "additionalProperties": false
+      },
+      "WarmLeadRunResponse": {
+        "type": "object",
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/WarmLeadRun"
+          }
+        },
+        "required": ["run"],
+        "additionalProperties": false
+      },
+      "WarmLeadRun": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "signals_running",
+              "contacts_running",
+              "drafting_running",
+              "completed",
+              "blocked",
+              "failed"
+            ]
+          },
+          "domain": {
+            "type": "string"
+          },
+          "normalized_domain": {
+            "type": "string"
+          },
+          "credits_charged": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blocked_reason": {
+            "type": ["string", "null"]
+          },
+          "error_message": {
+            "type": ["string", "null"]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WarmLeadResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider_counters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "domain",
+          "normalized_domain",
+          "credits_charged",
+          "created_at",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "WarmLeadResult": {
+        "type": "object",
+        "description": "Canonical JSON warm-lead result. CSV and XLSX exports are flattened projections of this object.",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "blocked", "failed"]
+          },
+          "account": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "signals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "contacts": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "scoring": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "drafts": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "policy": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "counters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "exportRows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "exportUrls": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "runId",
+          "status",
+          "account",
+          "signals",
+          "contacts",
+          "scoring",
+          "drafts",
+          "policy",
+          "counters"
+        ],
+        "additionalProperties": true
       },
       "UpdateLeadMagnetRequest": {
         "type": "object",
