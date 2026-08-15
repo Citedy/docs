@@ -4715,7 +4715,7 @@
                 "id": {
                   "type": ["string", "null"],
                   "format": "uuid",
-                  "description": "Social account UUID — use as accountId when publishing"
+                  "description": "Legacy primary active social account UUID. Equals the first accounts entry ordered by ID."
                 },
                 "platform": {
                   "type": "string"
@@ -4725,9 +4725,33 @@
                 },
                 "account_name": {
                   "type": ["string", "null"]
+                },
+                "accounts": {
+                  "type": "array",
+                  "description": "All active social accounts for this platform, ordered by ID. Use an explicit account ID when publishing.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "account_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "account_name"],
+                    "additionalProperties": false
+                  }
                 }
               },
-              "required": ["id", "platform", "connected", "account_name"]
+              "required": [
+                "id",
+                "platform",
+                "connected",
+                "account_name",
+                "accounts"
+              ]
             }
           },
           "stats_url": {
@@ -6155,10 +6179,17 @@
           "domain": {
             "type": "string"
           },
+          "source_mode": {
+            "type": "string",
+            "enum": [
+              "dataforseo_metrics",
+              "live_google_serp",
+              "similarity"
+            ]
+          },
           "visibility": {
             "type": "number",
-            "minimum": 0,
-            "maximum": 1
+            "minimum": 0
           },
           "keywords_count": {
             "type": "integer"
@@ -6168,14 +6199,34 @@
           },
           "etv": {
             "type": "number"
+          },
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "queries_matched": {
+                "type": "integer"
+              },
+              "best_position": {
+                "type": "number"
+              },
+              "example_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "required": [
+              "queries_matched",
+              "best_position",
+              "example_urls"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
-          "domain",
-          "visibility",
-          "keywords_count",
-          "avg_position",
-          "etv"
+          "domain"
         ],
         "additionalProperties": false
       },
